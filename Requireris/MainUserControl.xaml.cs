@@ -36,25 +36,39 @@ namespace Requireris
             ((ListBoxItem)MyListView.ContainerFromElement((Button)sender)).IsSelected = false;
 
             Console.WriteLine("SECRET=" + secret);
-            byte[] key = Base32.Base32Encoder.Decode(secret);
-            Console.WriteLine("KEY=" + key);
+            byte[] key;
+            try
+            {
+                // Google send you base32 string you need to decode it before using it.
+                key = Base32.Base32Encoder.Decode(secret);
+            }
+            catch (Exception)
+            {
+                return;
+            }
 
-            string message = Math.Floor(DateTime.Now.Subtract(new DateTime(1970, 1, 1)).TotalSeconds / 30.0).ToString();
-            Console.WriteLine("MESSAGE=" + message);
+            // T = (Current Unix time - T0) / X (RFC 6238)
+            // Here we get the current time, then we substract the unix epoch (1st January 1970) and we divide by the step
+            // T0 is unix's epoch it's the default value
+            // X is the step here 30 seconds. Like before we use the default value
+            byte[] message = BitConverter.GetBytes((Int64)Math.Floor((DateTime.Now.ToUniversalTime() - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds / 30.0));
+            // Why ? Why is it in big endian !!! See 5.2 Description RFC 4226
+            message = message.Reverse().ToArray();
 
+            // We use HMAC-SHA-1 algorithm because HOTP is based on this algorithm
             HMACSHA1 hmac = new HMACSHA1(key);
-            byte[] hash = hmac.ComputeHash(Encoding.ASCII.GetBytes(message.ToCharArray()));
-            Console.WriteLine("HASH=" + hash);
+            byte[] hash = hmac.ComputeHash(message);
 
+            // We extract the nibble (quartet) of the last char 
             int nibble = (hash[hash.Length - 1] & 0xf);
-            Console.WriteLine("NIBBLE=" + nibble);
 
+            // We extract 4 bytes from byte array and we need to set the first bit to 0
             int truncatedHash = (hash[nibble] & 0x7f) << 24 | (hash[nibble + 1] & 0xff) << 16 | (hash[nibble + 2] & 0xff) << 8 | (hash[nibble + 3] & 0xff);
-            Console.WriteLine("TRUNCATED=" + truncatedHash);
-
+            
+            // We get a 6 digit code
             string code = (truncatedHash % 1000000).ToString();
-            Console.WriteLine("CODE=" + code);
 
+            // If needed we add '0' if the code doesn't have enough digit
             while (code.Length < 6)
                 code = "0" + code;
             Code.Text = code.ToString();
@@ -64,7 +78,8 @@ namespace Requireris
         {
             string mail = MyListView.SelectedItem as string;
 
-            _addAccount.DeleteAccount(mail);
+            if (mail != null)
+                _addAccount.DeleteAccount(mail);
         }
 
         public void LoadAccount(AddAccountUserControl addAccount)

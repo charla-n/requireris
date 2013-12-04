@@ -69,12 +69,24 @@ namespace Requireris
                 _listAccounts.Add(MailTextBox.Text);
                 MailTextBox.Text = "";
                 SecretTextBox.Text = "";
-                using (FileStream stream = new FileStream(FILE, FileMode.OpenOrCreate))
+                if (!File.Exists(FILE))
                 {
-                    XmlSerializer serializer = new XmlSerializer(typeof(List<MyKeyValuePair<string, string>>));
+                    using (FileStream stream = File.Create(FILE))
+                    {
+                        XmlSerializer serializer = new XmlSerializer(typeof(List<MyKeyValuePair<string, string>>));
 
-                    serializer.Serialize(stream, _dic);
-                };
+                        serializer.Serialize(stream, _dic);
+                    }
+                }
+                else
+                {
+                    using (FileStream stream = new FileStream(FILE, FileMode.Truncate))
+                    {
+                        XmlSerializer serializer = new XmlSerializer(typeof(List<MyKeyValuePair<string, string>>));
+
+                        serializer.Serialize(stream, _dic);
+                    };
+                }
             }
         }
 
@@ -90,7 +102,7 @@ namespace Requireris
 
             _dic.Remove(at);
             _listAccounts.Remove(mail);
-            using (FileStream stream = new FileStream(FILE, FileMode.OpenOrCreate))
+            using (FileStream stream = new FileStream(FILE, FileMode.Truncate))
             {
                 XmlSerializer serializer = new XmlSerializer(typeof(List<MyKeyValuePair<string, string>>));
 
