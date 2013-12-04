@@ -49,17 +49,8 @@ namespace Requireris
             int nibble = (hash[hash.Length - 1] & 0xf);
             Console.WriteLine("NIBBLE=" + nibble);
 
-            byte[] b = new byte[4];
-
-            for (int i = 0; i < 4; i++)
-                b[i] = hash[nibble + i];
-
-            int truncatedHash = BitConverter.ToInt32(b, 0);
-            //int truncatedHash = (hash[nibble] << 24) + (hash[nibble + 1] << 16) + (hash[nibble + 2] << 8) + hash[nibble + 3];
+            int truncatedHash = (hash[nibble] & 0x7f) << 24 | (hash[nibble + 1] & 0xff) << 16 | (hash[nibble + 2] & 0xff) << 8 | (hash[nibble + 3] & 0xff);
             Console.WriteLine("TRUNCATED=" + truncatedHash);
-
-            truncatedHash = truncatedHash & 0x7FFFFF;
-            Console.WriteLine("TRUNCATED_ZERO_FIRST_BIT=" + truncatedHash);
 
             string code = (truncatedHash % 1000000).ToString();
             Console.WriteLine("CODE=" + code);
