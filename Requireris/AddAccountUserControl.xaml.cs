@@ -35,18 +35,22 @@ namespace Requireris
             main.MyListView.ItemsSource = _listAccounts;
             InitializeComponent();
 
-            using (FileStream stream = new FileStream(FILE, FileMode.Open))
+            try
             {
-                TextReader reader = new StreamReader(stream);
-                XmlSerializer serializer = new XmlSerializer(typeof(List<MyKeyValuePair<string, string>>));
-
-                _dic = serializer.Deserialize(reader) as List<MyKeyValuePair<string, string>>;
-                foreach (MyKeyValuePair<string, string> cur in _dic)
+                using (FileStream stream = new FileStream(FILE, FileMode.OpenOrCreate))
                 {
-                    Console.WriteLine("Email=" + cur.Key + " Secret=" + cur.Value);
-                    _listAccounts.Add(cur.Key);
+                    TextReader reader = new StreamReader(stream);
+                    XmlSerializer serializer = new XmlSerializer(typeof(List<MyKeyValuePair<string, string>>));
+
+                    _dic = serializer.Deserialize(reader) as List<MyKeyValuePair<string, string>>;
+                    foreach (MyKeyValuePair<string, string> cur in _dic)
+                    {
+                        Console.WriteLine("Email=" + cur.Key + " Secret=" + cur.Value);
+                        _listAccounts.Add(cur.Key);
+                    }
                 }
             }
+            catch (Exception) { }
         }
         
         private void AddAcountEvent(object sender, RoutedEventArgs e)
@@ -55,7 +59,7 @@ namespace Requireris
             {
                 InvalidMail.Visibility = System.Windows.Visibility.Visible;
             }
-            else if (SecretTextBox.Text.Length != 16)
+            else if (SecretTextBox.Text.Length != 32)
             {
                 InvalidSecret.Visibility = System.Windows.Visibility.Visible;
             }
@@ -78,6 +82,33 @@ namespace Requireris
         {
             InvalidMail.Visibility = System.Windows.Visibility.Collapsed;
             InvalidSecret.Visibility = System.Windows.Visibility.Collapsed;
+        }
+
+        public void DeleteAccount(string mail)
+        {
+            MyKeyValuePair<string, string> at = _dic.Where(d => d.Key == mail).FirstOrDefault();
+
+            _dic.Remove(at);
+            _listAccounts.Remove(mail);
+            using (FileStream stream = new FileStream(FILE, FileMode.OpenOrCreate))
+            {
+                XmlSerializer serializer = new XmlSerializer(typeof(List<MyKeyValuePair<string, string>>));
+
+                serializer.Serialize(stream, _dic);
+            };
+        }
+
+        public string GetSecret(string mail)
+        {
+            Console.WriteLine("MAIL=" + mail);
+            try
+            {
+                return _dic.Where(d => d.Key == mail).FirstOrDefault().Value;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
     }
 }

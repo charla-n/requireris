@@ -75,7 +75,11 @@
     </UserControl.Resources>
     
     <Grid>
-        <ListView x:Name="MyListView" Background="#454548" BorderThickness="0" Style="{StaticResource ListStyle}">
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="30"/>
+        </Grid.RowDefinitions>
+        <ListView Grid.Row="0" x:Name="MyListView" Background="#454548" BorderThickness="0" Style="{StaticResource ListStyle}">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <StackPanel>
@@ -101,5 +105,6 @@
                 </ContextMenu>
             </ListView.ContextMenu>
         </ListView>
+        <TextBlock TextAlignment="Center" FontSize="16" FontWeight="Bold" Foreground="White" x:Name="Code" Grid.Row="1"/>
     </Grid>
 </UserControl>

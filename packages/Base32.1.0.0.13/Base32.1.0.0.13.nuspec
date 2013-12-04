@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>Base32</id>
+    <version>1.0.0.13</version>
+    <title>Base32</title>
+    <authors>Devin Martin</authors>
+    <owners>Devin Martin</owners>
+    <licenseUrl>https://s3.amazonaws.com/OtpSharp/LICENSE.txt</licenseUrl>
+    <projectUrl>https://bitbucket.org/devinmartin/base32/wiki/Home</projectUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <description>An implementation of RFC 4648 Base32</description>
+    <releaseNotes />
+    <copyright>Copyright 2013 Devin Martin</copyright>
+    <language />
+    <tags>base32 RFC-4648 rfc 4648 base-32</tags>
+  </metadata>
+</package>

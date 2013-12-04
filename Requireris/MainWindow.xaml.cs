@@ -28,6 +28,7 @@ namespace Requireris
         {
             _main = new MainUserControl();
             _account = new AddAccountUserControl(_main);
+            _main.LoadAccount(_account);
             InitializeComponent();
             ContentControl.Content = _main;
         }
