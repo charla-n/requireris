@@ -1,0 +1,19 @@
+﻿<UserControl x:Class="Requireris.AddAccountUserControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+
+    <StackPanel Margin="5">
+    	<TextBlock TextWrapping="Wrap" FontSize="16" Foreground="#FFF5EBEB"><Run Language="fr-fr" Text="Mail address :"/></TextBlock>
+        <TextBox GotFocus="Form_GotFocus" x:Name="MailTextBox" Height="23" TextWrapping="Wrap" Width="250" Margin="0,10,0,0"/>
+        <TextBlock x:Name="InvalidMail" Visibility="Collapsed" TextWrapping="Wrap" FontSize="16" Foreground="#FF0000" Margin="0,10,0,0">Please enter a valid mail</TextBlock>
+        <TextBlock TextWrapping="Wrap" FontSize="16" Foreground="#FFF5EBEB" Margin="0,10,0,0"><Run Language="fr-fr" Text="Base 32 string :"/></TextBlock>
+        <TextBox GotFocus="Form_GotFocus" x:Name="SecretTextBox" Height="23" TextWrapping="Wrap" Width="250" Margin="0,10,0,0"/>
+        <TextBlock x:Name="InvalidSecret" Visibility="Collapsed" TextWrapping="Wrap" FontSize="16" Foreground="#FF0000" Margin="0,10,0,0">Please enter a valid secret</TextBlock>
+        <Button Click="AddAcountEvent" Content="Add account" Margin="0,20,0,0" Width="80"/>
+        
+    </StackPanel>
+</UserControl>
