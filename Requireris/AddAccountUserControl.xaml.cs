@@ -15,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Xml;
 using System.Xml.Serialization;
 
 namespace Requireris
@@ -41,6 +42,7 @@ namespace Requireris
                 {
                     TextReader reader = new StreamReader(stream);
                     XmlSerializer serializer = new XmlSerializer(typeof(List<MyKeyValuePair<string, string>>));
+                    //XmlReader xr = XmlReader.Create(reader, new XmlReaderSettings { CheckCharacters = false });
 
                     _dic = serializer.Deserialize(reader) as List<MyKeyValuePair<string, string>>;
                     foreach (MyKeyValuePair<string, string> cur in _dic)
@@ -50,7 +52,10 @@ namespace Requireris
                     }
                 }
             }
-            catch (Exception) { }
+            catch (Exception e)
+            {
+                Console.WriteLine("EXCEP=" + e);
+            }
         }
         
         private void AddAcountEvent(object sender, RoutedEventArgs e)
@@ -65,7 +70,9 @@ namespace Requireris
             }
             else
             {
-                _dic.Add(new MyKeyValuePair<string, string>(MailTextBox.Text, SecretTextBox.Text));
+                string encrypt = Base32.Base32Encoder.Encode(MyCrypt.Protect(Encoding.ASCII.GetBytes(SecretTextBox.Text)));
+
+                _dic.Add(new MyKeyValuePair<string, string>(MailTextBox.Text, encrypt));
                 _listAccounts.Add(MailTextBox.Text);
                 MailTextBox.Text = "";
                 SecretTextBox.Text = "";
@@ -83,7 +90,7 @@ namespace Requireris
                     using (FileStream stream = new FileStream(FILE, FileMode.Truncate))
                     {
                         XmlSerializer serializer = new XmlSerializer(typeof(List<MyKeyValuePair<string, string>>));
-
+                        
                         serializer.Serialize(stream, _dic);
                     };
                 }
@@ -115,7 +122,7 @@ namespace Requireris
             Console.WriteLine("MAIL=" + mail);
             try
             {
-                return _dic.Where(d => d.Key == mail).FirstOrDefault().Value;
+                return Encoding.Default.GetString(MyCrypt.UnProtect(Base32.Base32Encoder.Decode(_dic.Where(d => d.Key == mail).FirstOrDefault().Value)));
             }
             catch (Exception)
             {
