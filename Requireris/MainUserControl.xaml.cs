@@ -86,5 +86,23 @@ namespace Requireris
         {
             _addAccount = addAccount;
         }
+
+        private void Modify_Click(object sender, RoutedEventArgs e)
+        {
+            SecretModify win = new SecretModify();
+            string mail = MyListView.SelectedItem as string;
+
+            if (mail != null)
+            {
+                win.Secret.Text = _addAccount.GetSecret(mail);
+                if (win.ShowDialog() == true)
+                {
+                    if (win.Secret.Text.Length == 32)
+                    {
+                        _addAccount.SetSecret(mail, win.Secret.Text);
+                    }
+                }
+            }
+        }
     }
 }

@@ -42,7 +42,6 @@ namespace Requireris
                 {
                     TextReader reader = new StreamReader(stream);
                     XmlSerializer serializer = new XmlSerializer(typeof(List<MyKeyValuePair<string, string>>));
-                    //XmlReader xr = XmlReader.Create(reader, new XmlReaderSettings { CheckCharacters = false });
 
                     _dic = serializer.Deserialize(reader) as List<MyKeyValuePair<string, string>>;
                     foreach (MyKeyValuePair<string, string> cur in _dic)
@@ -52,19 +51,21 @@ namespace Requireris
                     }
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine("EXCEP=" + e);
+                File.Delete(FILE);
             }
         }
         
         private void AddAcountEvent(object sender, RoutedEventArgs e)
         {
+            string secret = SecretTextBox.Text.Replace(" ", "");
+
             if (!Regex.IsMatch(MailTextBox.Text, @"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$"))
             {
                 InvalidMail.Visibility = System.Windows.Visibility.Visible;
             }
-            else if (SecretTextBox.Text.Length != 32)
+            else if (secret.Length != 32)
             {
                 InvalidSecret.Visibility = System.Windows.Visibility.Visible;
             }
@@ -128,6 +129,19 @@ namespace Requireris
             {
                 return null;
             }
+        }
+
+        public void SetSecret(string mail, string secret)
+        {
+            string encrypt = Base32.Base32Encoder.Encode(MyCrypt.Protect(Encoding.ASCII.GetBytes(secret)));
+
+            _dic.Where(a => a.Key == mail).FirstOrDefault().Value = encrypt;
+            using (FileStream stream = new FileStream(FILE, FileMode.Truncate))
+            {
+                XmlSerializer serializer = new XmlSerializer(typeof(List<MyKeyValuePair<string, string>>));
+
+                serializer.Serialize(stream, _dic);
+            };
         }
     }
 }

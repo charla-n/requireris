@@ -100,7 +100,14 @@
             <ListView.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Delete" Click="Delete_Click">
-                        
+                        <MenuItem.Icon>
+                            <Image Source="delete.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Modify secret" Click="Modify_Click">
+                        <MenuItem.Icon>
+                            <Image Source="open.png"/>
+                        </MenuItem.Icon>
                     </MenuItem>
                 </ContextMenu>
             </ListView.ContextMenu>
