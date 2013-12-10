@@ -64,6 +64,10 @@ namespace Requireris
             if (!Regex.IsMatch(MailTextBox.Text, @"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$"))
             {
                 InvalidMail.Visibility = System.Windows.Visibility.Visible;
+                if (secret.Length != 32)
+                {
+                    InvalidSecret.Visibility = System.Windows.Visibility.Visible;
+                }
             }
             else if (secret.Length != 32)
             {
