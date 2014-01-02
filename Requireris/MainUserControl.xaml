@@ -112,6 +112,7 @@
                 </ContextMenu>
             </ListView.ContextMenu>
         </ListView>
-        <TextBlock TextAlignment="Center" FontSize="16" FontWeight="Bold" Foreground="White" x:Name="Code" Grid.Row="1"/>
+        <ProgressBar x:Name="Progress" Margin="5,0,5,0" Height="20" Grid.Row="1" Maximum="30"></ProgressBar>
+        <TextBlock Margin="0,3,0,0" Panel.ZIndex="1" TextAlignment="Center" FontSize="16" FontWeight="Bold" Foreground="#007ACC" x:Name="Code" Grid.Row="1"/>
     </Grid>
 </UserControl>

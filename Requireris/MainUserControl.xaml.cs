@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -22,25 +23,49 @@ namespace Requireris
     /// </summary>
     public partial class MainUserControl : UserControl
     {
+        string lastSecret;
+        Timer remainTimer;
         AddAccountUserControl _addAccount;
 
         public MainUserControl()
         {
+            remainTimer = new Timer(1000);
+            remainTimer.Elapsed += remainTimer_Elapsed;
             InitializeComponent();
+        }
+
+        private void remainInc()
+        {
+            if (Progress.Value == 30)
+            {
+                Generate_Click(null, null);
+                Progress.Value = 0;
+            }
+            else
+                Progress.Value++;
+        }
+
+        private void remainTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            Dispatcher.Invoke(remainInc);
         }
 
         private void Generate_Click(object sender, RoutedEventArgs e)
         {
-            ((ListBoxItem)MyListView.ContainerFromElement((Button)sender)).IsSelected = true;
-            string secret = _addAccount.GetSecret(MyListView.SelectedItem as string);
-            ((ListBoxItem)MyListView.ContainerFromElement((Button)sender)).IsSelected = false;
+            if (e != null && sender != null)
+            {
+                ((ListBoxItem)MyListView.ContainerFromElement((Button)sender)).IsSelected = true;
+                string secret = _addAccount.GetSecret(MyListView.SelectedItem as string);
+                lastSecret = secret;
+                ((ListBoxItem)MyListView.ContainerFromElement((Button)sender)).IsSelected = false;
+            }
 
-            Console.WriteLine("SECRET=" + secret);
+            Console.WriteLine("SECRET=" + lastSecret);
             byte[] key;
             try
             {
                 // Google send you base32 string you need to decode it before using it.
-                key = Base32.Base32Encoder.Decode(secret);
+                key = Base32.Base32Encoder.Decode(lastSecret);
             }
             catch (Exception)
             {
@@ -52,6 +77,7 @@ namespace Requireris
             // T0 is unix's epoch it's the default value
             // X is the step here 30 seconds. Like before we use the default value
             byte[] message = BitConverter.GetBytes((Int64)Math.Floor((DateTime.Now.ToUniversalTime() - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds / 30.0));
+            int remain = (int)Math.Floor((DateTime.Now.ToUniversalTime() - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds % 30.0);
             // Why ? Why is it in big endian !!! See 5.2 Description RFC 4226
             message = message.Reverse().ToArray();
 
@@ -72,6 +98,9 @@ namespace Requireris
             while (code.Length < 6)
                 code = "0" + code;
             Code.Text = code.ToString();
+
+            Progress.Value = remain;
+            remainTimer.Start();
         }
 
         private void Delete_Click(object sender, RoutedEventArgs e)

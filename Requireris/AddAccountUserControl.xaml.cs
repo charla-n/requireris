@@ -61,7 +61,7 @@ namespace Requireris
         {
             string secret = SecretTextBox.Text.Replace(" ", "");
 
-            if (!Regex.IsMatch(MailTextBox.Text, @"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$"))
+            if (!Regex.IsMatch(MailTextBox.Text, @"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$") || _dic.Exists(a => a.Key == MailTextBox.Text))
             {
                 InvalidMail.Visibility = System.Windows.Visibility.Visible;
                 if (secret.Length != 32)
@@ -75,7 +75,7 @@ namespace Requireris
             }
             else
             {
-                string encrypt = Base32.Base32Encoder.Encode(MyCrypt.Protect(Encoding.ASCII.GetBytes(SecretTextBox.Text)));
+                string encrypt = Base32.Base32Encoder.Encode(MyCrypt.Protect(Encoding.ASCII.GetBytes(secret)));
 
                 _dic.Add(new MyKeyValuePair<string, string>(MailTextBox.Text, encrypt));
                 _listAccounts.Add(MailTextBox.Text);
